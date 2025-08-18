@@ -1,0 +1,7 @@
+# entry point for snakemake pipeline
+
+from pathlib import Path
+import pandas as pd
+import yaml
+
+include: "rules/prep.smk"
