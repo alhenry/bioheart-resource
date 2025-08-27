@@ -5,3 +5,4 @@ import pandas as pd
 import yaml
 
 include: "rules/prep.smk"
+include: "rules/magma.smk"
