@@ -9,7 +9,7 @@ cluster-generic-submit-cmd:
     -cwd
     -o job_logs
     -e job_logs
-    -l mem_requested={resources.mem_mb}M
+    -l mem_requested={resources.mem}
     -l h_rt={resources.time}
     -pe smp {resources.nodes}
 cluster-generic-cancel-cmd: qdel {rule}-{wildcards}
@@ -17,7 +17,7 @@ cluster-generic-cancel-cmd: qdel {rule}-{wildcards}
 default-resources:
   time: 6:00:00
   nodes: 4
-  mem_mb: 8000
+  mem: 8G
 jobs: 20
 local-cores: 4
 latency-wait: 10

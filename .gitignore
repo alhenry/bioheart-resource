@@ -64,3 +64,5 @@ po/*~
 # RStudio Connect folder
 rsconnect/
 
+# sshfs mount file
+._*

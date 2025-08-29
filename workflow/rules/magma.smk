@@ -111,32 +111,29 @@ rule magma_agg_gene_assoc:
 		"""
 
 # # update gene out with hgnc_symbols & fdr correction (with qvalue)
-# rule magma_format_output:
-#     input:
-#         out = rules.magma_agg_gene_assoc.output.out,
-#         gene_loc = "resources/magma/geneanno.loc"
-#     output:
-#         "results/magma/aggregate/{geno_set}/{pheno}.magma.tsv"
-#     conda: "renv"
-#     script:
-#         "snakescripts/magma_format_output.R"
+rule magma_format_output:
+    input:
+        out = rules.magma_agg_gene_assoc.output.out,
+        gene_loc = "resources/magma/geneanno.loc"
+    output:
+        "results/magma/aggregate/{geno_set}/{pheno}.magma.tsv"
+    conda: "renv"
+    script:
+        "snakescripts/magma_format_output.R"
 
 # # run results for all trait
-# def get_trait_input(x):
-#     """
-#     Get the input for all traits
-#     """
-#     df_meta = pd.read_csv("resources/metadata/trait_metadata_n.tsv", encoding_errors = "ignore", sep="\t")
-#     pheno_meta = df_meta['trait_id'].unique()
-#     input_dir = Path("resources/ma/")
-#     pheno = [f.stem for f in input_dir.glob("*.ma") \
-#              if f.is_file() and f.stem in pheno_meta]
-#     files = [f"results/magma/aggregate/{x.geno_set}/{p}.magma.tsv" for p in pheno]
-#     return files
+def get_trait_input(x):
+    """
+    Get the input for all traits
+    """
+    phenos = [f.with_suffix('').name for f in Path("resources/metadata/phenotypes").glob("*.yaml")]
+    
+    files = [f"results/magma/aggregate/{x.geno_set}/{p}.magma.tsv" for p in phenos]
+    return files
 
-# rule magma_all_trait:
-#     input: get_trait_input
-#     output: "results/aggregate/{geno_set}.magma.gz.parquet"
-#     conda: "renv"
-#     log: "logs/aggregate/{geno_set}.magma.log"
-#     script: "snakescripts/aggregate/magma.R"
+rule magma_all_trait:
+    input: get_trait_input
+    output: "results/aggregate/{geno_set}.magma.parquet.gz"
+    conda: "renv"
+    log: "logs/aggregate/{geno_set}.magma.log"
+    script: "snakescripts/aggregate/magma.R"

@@ -6,3 +6,4 @@ import yaml
 
 include: "rules/prep.smk"
 include: "rules/magma.smk"
+include: "rules/scdrs.smk"
