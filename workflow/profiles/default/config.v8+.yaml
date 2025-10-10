@@ -15,7 +15,7 @@ cluster-generic-submit-cmd:
 cluster-generic-cancel-cmd: qdel {rule}-{wildcards}
 # cluster-generic-status-cmd: qstat -j {rule}-{wildcards}
 default-resources:
-  time: 6:00:00
+  time: 24:00:00
   nodes: 4
   mem: 8G
 jobs: 20

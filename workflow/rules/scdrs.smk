@@ -65,14 +65,15 @@ rule scdrs_prep_h5ad_cov:
     input:
         h5ad = "resources/scdrs/h5ad/{geno_set}.h5ad",
         sample_covar = "resources/scdrs/sample_covar/{geno_set}.sample_covar.csv",
-        config = "resources/scdrs/config/{geno_set}.yaml"
+        config = "resources/scdrs/config/{geno_set}.yaml",
+        cell_meta = "resources/scdrs/cell_meta/{geno_set}.csv"
     output:
         prep_h5ad = "resources/scdrs/h5ad/{geno_set}.prep.h5ad",
         cov = "resources/scdrs/cov/{geno_set}.cov.tsv"
     conda: "scverse"
     resources:
         ncpus = 8,
-        mem =  "80G"
+        mem =  "200G"
     log: "logs/scdrs/{geno_set}.prep_h5ad_cov.log"
     script: "snakescripts/scdrs/prep/{wildcards.geno_set}.py"
 
@@ -91,8 +92,8 @@ rule scdrs_regress_h5ad_cov:
         "resources/scdrs/h5ad/{geno_set}.reg.h5ad.pkl"
     conda: "scverse"
     resources:
-        ncpus = 16,
-        mem =  "8G"
+        ncpus = 8,
+        mem =  "200G"
     log: "logs/scdrs/{geno_set}.regress_h5ad_cov.log"
     script: "snakescripts/scdrs/regress_h5ad_cov.py"
 
@@ -109,10 +110,29 @@ rule scdrs_compute_score_api:
         celltype = "results/scdrs/cell_type_stats/{geno_set}/{phenotype}.cell_type_stats.tsv"
     conda: "scverse"
     resources:
+        time = "24:00:00",
         ncpus = 8,
-        mem =  "8G"
-    log: "logs/scdrs/{geno_set}-{phenotype}.regress_h5ad_cov.log"
+        mem =  "200G"
+    log: "logs/scdrs/{geno_set}-{phenotype}.compute_score.log"
     script: "snakescripts/scdrs/compute_score.py"
+
+# rule scdrs_compute_group_stats_api:
+#     """
+#     Compute scDRS cell type stats using the python API per phenotype
+#     """
+#     input:
+#         reg_pkl = "resources/scdrs/h5ad/{geno_set}.reg.h5ad.pkl",
+#         gs = "resources/scdrs/gs_chunked/{geno_set}/{phenotype}.gs",
+#         config = "resources/scdrs/config/{geno_set}.yaml",
+#         cell = "results/scdrs/cell_score/{geno_set}/{phenotype}.cell_score.tsv.parquet.gz"
+#     output:
+#         celltype = "results/scdrs/cell_type_stats/{geno_set}/{phenotype}.cell_type_stats.tsv"
+#     conda: "scverse"
+#     resources:
+#         ncpus = 8,
+#         mem =  "8G"
+#     log: "logs/scdrs/{geno_set}-{phenotype}.compute_group_stats.log"
+#     script: "snakescripts/scdrs/compute_group_stats.py"
 
 rule scdrs_get_top_score:
     """
@@ -128,8 +148,9 @@ rule scdrs_get_top_score:
     params:
         percentiles = [90, 95,99]
     resources:
+        time = "24:00:00",
         ncpus = 8,
-        mem =  "8G"
+        mem =  "200G"
     log: "logs/scdrs/{geno_set}-{phenotype}.get_top_score.log"
     script: "snakescripts/scdrs/get_top_score.py"
 
@@ -154,8 +175,9 @@ rule scdrs_aggregate_stat:
         cell_type_stats = "results/aggregate/{geno_set}.scdrs.cell_type_stats.tsv",
         cell_type_top = "results/aggregate/{geno_set}.scdrs.cell_type_top.tsv"
     resources:
+        time = "24:00:00",
         ncpus = 8,
-        mem =  "8G"
+        mem =  "200G"
     log: "logs/aggregate/{geno_set}.scdrs_cell_type_stat.log"
     conda: "renv"
     script: "snakescripts/aggregate/scdrs_cell_type.R"
@@ -186,8 +208,9 @@ rule scdrs_aggregate_score:
         mcp  = "results/aggregate/{geno_set}.scdrs.cell_mcp.tsv.parquet.gz"
     conda: "scverse"
     resources:
-        ncpus = 16,
-        mem =  "10G"
+        time = "30:00:00",
+        ncpus = 12,
+        mem =  "240G"
     log: "logs/aggregate/{geno_set}.scdrs_cell_score.log"
     script: "snakescripts/aggregate/scdrs_cell_score.py"
 
